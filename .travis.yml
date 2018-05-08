@@ -1,0 +1,6 @@
+language: python
+python:
+        - "3.6"
+
+script: sychro.sh --from bucket:pierreoq/test1  --to hub:poquirion/test1
+
