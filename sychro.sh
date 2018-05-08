@@ -1,30 +1,27 @@
-age (){
-  echo -e "\nUsage: $0 -f <bitbucket repo> -t <github repo> [ -r ]" 1>&2;
-  echo -e "\n  Syncro repo from bitbucket to github (or the inverse with -r)"
+#!/bin/bash
+
+
+usage (){
+  echo -e "\nUsage: $0 -r <from bitbucket user/repo>  <to github user/repo>" 1>&2;
+  echo -e "\n  Sync repo from bitbucket to github (or the other way with -r)"
   echo -e "\nOPTION"
-  echo -e "\t-s    source repo, bitbucket is default"
-  echo -e "\t-d    destination repo, github is default"
-  echo -e "\t-r    do from gethub to bitbucket"
+  echo -e "\t-r    from github to bitbucket (still expereimental) "
   echo
 }
 
+if [ $# -lt 2 ]; then
+  usage
+  exit 1
+fi 
 
 BRANCH=master
-FROM=bitbucket
-TO=github
+FROM=bitbucket.org
+TO=github.com
 while getopts ":s:d:rh" opt; do
   case $opt in
     r)
-      FROM=github
-      TO=bitbucker
-      ;;
-    d)
-      echo "from $TO $OPTARG"
-      dest=$OPTARG
-      ;;
-    s)
-      echo "to  $FROM $OPTARG"
-      source=$OPTARG
+      FROM=github.com
+      TO=bitbucker.org
       ;;
     h)
       usage
@@ -42,15 +39,19 @@ while getopts ":s:d:rh" opt; do
   esac
 done
 
-
-IFS='/'; arrIN=($source); unset IFS;
-local_repo=$arrIN[1]
-
-from_path= https://git@bitbucket.org/${source}.git
-to_path= https://github.com/${dest}
+echo "from $TO $2"
+dest=$2
+echo "to  $FROM $1"
+src=$1
 
 
-git clone from_path
+IFS='/'; arrIN=( $src ); unset IFS;
+local_repo=${arrIN[1]}
+
+from_path=https://$FROM/${src}.git
+to_path=https://$GIT_TOKEN@$TO/${dest}
+
+git clone $from_path
 
 cd $local_repo
 # I am not pulling form to_clone since this is supposed to be the only system pushing to that repo/branch
